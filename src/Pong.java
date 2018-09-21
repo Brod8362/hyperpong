@@ -3,7 +3,6 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Pong extends JFrame implements KeyListener {
@@ -32,22 +31,8 @@ public class Pong extends JFrame implements KeyListener {
 
     @Override
     public void keyTyped(KeyEvent e) {
-        PongObject player1 = objects.get(0);
-        PongObject player2 = objects.get(1);
-        Graphics window = globalFrame.getGraphics();
-        if (e.getKeyChar() == 's') {
-            player1.changeYPos(window,5);
-        } else if (e.getKeyChar() == 'w') {
-            player1.changeYPos(window, -5);
-        } else if (e.getKeyChar() == 'q') {
-            System.exit(6);
-        } else if (e.getKeyChar() == 'i') {
-            player2.changeYPos(window, -5);
-        } else if (e.getKeyChar() == 'k') {
-            player2.changeYPos(window, 5);
-        }
+        //dont care
     }
-
     @Override
     public void keyReleased(KeyEvent e) {
         //dont care
@@ -55,8 +40,24 @@ public class Pong extends JFrame implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        //do nothing
+        PongObject player1 = objects.get(0);
+        PongObject player2 = objects.get(1);
+        Graphics window = globalFrame.getGraphics();
+        int key = e.getKeyCode();
+        if (key == KeyEvent.VK_S) {
+            player1.changeYPos(window,15);
+        } else if (key == KeyEvent.VK_W) {
+            player1.changeYPos(window, -15);
+        } else if (key == KeyEvent.VK_Q) {
+            System.exit(6);
+        } else if (key == KeyEvent.VK_I) {
+            player2.changeYPos(window, -15);
+        } else if (key == KeyEvent.VK_K) {
+            player2.changeYPos(window, 15);
+        }
     }
+
+
 
 
     public void main() {
@@ -84,9 +85,11 @@ public class Pong extends JFrame implements KeyListener {
                 for (PongObject object : objects) { //iterate over and draw objects
                     i ++;
                     object.update(window, objects);
-                    // draw object
+                    // update object
                     object.draw(window);
                     // draw object
+                    object.drawHitbox(window);
+                    // draw hitbox
                     window.drawString(object+"", 25, i*30);
                     // draw diagnostic info
 

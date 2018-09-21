@@ -10,6 +10,7 @@ abstract class PongObject {
     protected Color color = Color.WHITE;
 
 
+
     protected int getXPos() {
         return xPos;
     }
@@ -87,9 +88,31 @@ abstract class PongObject {
         }*/
     }
 
-    protected boolean touching() {
+    protected boolean touching(ArrayList<PongObject> objects) {
+        for (PongObject object : objects) {
+            if (touching(object)) {
+                return true;
+            }
+        }
         return false;
     }
+
+    protected boolean touching(PongObject object) {
+        if (object != this && object.isSolid()) {
+            int otherX = object.getXPos();
+            int otherY = object.getYPos();
+            int otherWidth = object.getWidth();
+            int otherHeight = object.getHeight();
+            if ( yPos > otherY && yPos < otherY + otherHeight && xPos > otherX && xPos < otherX + otherWidth
+                    || xPos+width < otherX+width && xPos+width > otherX && yPos+height > otherY && yPos+height < otherY+otherHeight ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+
 
     protected void update() {
     }
@@ -104,6 +127,26 @@ abstract class PongObject {
 
     protected boolean isSolid() {
         return solid;
+    }
+
+    protected double calculateBounceAngle(PongObject object) {
+        int sizeY = object.getYPos()-object.getHeight();
+        int sizeX = object.getWidth()-object.getXPos(); //currently useless
+
+        //dist from top
+        int dft = yPos-object.getYPos();
+        //percent from top
+        double pft = (double)dft/sizeY;
+        //get angle of bounce
+        double angle = pft*180;
+        return angle;
+
+    }
+
+
+    protected void drawHitbox(Graphics window) {
+        window.setColor(color);
+        window.drawRect(xPos, yPos, width, height);
     }
 }
 

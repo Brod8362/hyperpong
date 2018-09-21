@@ -4,6 +4,7 @@ import java.util.ArrayList;
 public class Ball extends PongObject {
 
     private int direction = -1;
+    private double yVel = 0;
 
     Ball(int x, int y) {
         xPos = x;
@@ -28,47 +29,58 @@ public class Ball extends PongObject {
         if (checkOOB(window)) {
             xPos = 1280/2;
         }
-        xPos += 5*direction;
+        xPos += 8*direction;
+        yPos += yVel;
     }
 
-
-    private boolean touching(ArrayList<PongObject> objects) {
+    @Override
+    public boolean touching(ArrayList<PongObject> objects) {
         for (PongObject object : objects) {
-            if (object != this && object.isSolid()) {
-                int otherX = object.getXPos();
-                int otherY = object.getYPos();
-                if ( yPos > otherY && yPos < otherY+object.getHeight() && xPos > otherX && xPos < otherX+object.getWidth() ) {
-                    return true;
+            if (touching(object)) {
+                yVel = calculateBounceAngle(object);
+                return true;
                 }
             }
-
-        }
         return false;
     }
 
-    private boolean touching(PongObject object) {
-        if (object != this && object.isSolid()) {
-                int otherX = object.getXPos();
-                int otherY = object.getYPos();
-            return yPos > otherY && yPos < otherY + object.getHeight() && xPos > otherX && xPos < otherX + object.getWidth();
-            }
-            return false;
-        }
-
 
     private boolean checkOOB(Graphics window) {
-        //int width = (int)window.getClipBounds().getWidth();
+        int height = 720;
         int width = 1280;
+
         if ( xPos < 0 ) {
             System.err.println("right player scored");
             direction *= -1;
+            yVel = 0;
+            yPos = height/2;
             return true;
         } else if ( xPos > width ) {
             System.err.println("left player scored");
             direction *= -1;
+            yVel = 0;
+            yPos = height/2;
             return true;
         }
+
+        if ( yPos < 0 || yPos > height) {
+            yVel *= -1;
+            return false;
+        }
         return false;
+    }
+
+    public double getyVel() {
+        return yVel;
+    }
+
+    public void setyVel(double vel) {
+        yVel = vel;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s: X: %d Y: %d Xb: %d Yb: %d yVel: %s", name, xPos, yPos, xPos+width, xPos+height, yVel);
     }
 
 
