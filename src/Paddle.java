@@ -10,7 +10,7 @@ public class Paddle extends PongObject {
         xPos = _xPos;
         yPos = _yPos;
         width = 25;
-        height = 85;
+        height = 125;
         name = "PADDLE";
     }
 
@@ -19,7 +19,7 @@ public class Paddle extends PongObject {
         xPos = _xPos;
         yPos = _yPos;
         width = 25;
-        height = 125;
+        height = 85;
         name = "PADDLE";
     }
 

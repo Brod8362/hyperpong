@@ -23,7 +23,9 @@ public class Pong extends JFrame implements KeyListener {
         int randY = ThreadLocalRandom.current().nextInt(100, height-100);
         int randH = ThreadLocalRandom.current().nextInt(50,  125);
         int randX = ThreadLocalRandom.current().nextInt(200, width-200);
-        objects.add(new Wall(randX, randY, 30, randH));
+        int randmHP = ThreadLocalRandom.current().nextInt(50, 300);
+
+        objects.add(new Wall(randX, randY, 30, randH, randmHP));
         // create a random wall with a random spawn position and a random height
 
     }
@@ -42,6 +44,7 @@ public class Pong extends JFrame implements KeyListener {
     public void keyPressed(KeyEvent e) {
         PongObject player1 = objects.get(0);
         PongObject player2 = objects.get(1);
+        PongObject wall = objects.get(3);
         Graphics window = globalFrame.getGraphics();
         int key = e.getKeyCode();
         if (key == KeyEvent.VK_S) {
@@ -66,7 +69,20 @@ public class Pong extends JFrame implements KeyListener {
         } else if (key == KeyEvent.VK_8) {
             player1.kill();
             player2.kill();
-            objects.get(3).kill();
+            wall.kill();
+        } else if (key == KeyEvent.VK_7) {
+            player1.fullHeal();
+            player2.fullHeal();
+        } else if (key == KeyEvent.VK_6) {
+            wall.heal(25);
+        } else if (key == KeyEvent.VK_5) {
+            wall.damage(25);
+        } else if (key == KeyEvent.VK_4) {
+            wall.revive();
+        } else if (key == KeyEvent.VK_3) {
+            wall.kill();
+        } else if (key == KeyEvent.VK_2) {
+            wall.fullHeal();
         }
     }
 
@@ -110,11 +126,11 @@ public class Pong extends JFrame implements KeyListener {
                     // update object
                     object.draw(window);
                     // draw object
-                    object.drawHitbox(window);
+                    //object.drawHitbox(window);
                     // draw hitbox
-                    window.drawString(object+"", 25, i*30);
+                    window.drawString(object.toString(), 25, i*30);
                     // draw diagnostic info
-
+                    window.drawString("(= HEAL) (- DAMAGE) (0 +999) (9 REVIVE) (8 KILL) (7 MAXHP) (6 WALL UP) (5 WALL DOWN) (4 WALL REVIVE) (3 WALL KILL) (2 WALL MAX)", 25, height-30);
                 }
             }
         }

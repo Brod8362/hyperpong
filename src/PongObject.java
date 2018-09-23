@@ -13,6 +13,7 @@ abstract class PongObject {
     protected boolean visible = true;
     protected int hpchange = 0;
     protected int maxhp = 100;
+    protected boolean invincible = false;
 
     protected int getXPos() {
         return xPos;
@@ -27,6 +28,10 @@ abstract class PongObject {
 
     protected int getHeight() {
         return height;
+    }
+
+    public boolean isInvincible() {
+        return invincible;
     }
 
     protected void draw(Graphics window) {
@@ -126,10 +131,15 @@ abstract class PongObject {
     protected void drawHP(Graphics window) {
         updateHP();
         //set bar color
-        if (hp <= maxhp*0.25) {
+        if (invincible) {
+            hpcolor = Color.MAGENTA;
+        }
+        else if (hp <= maxhp*0.25) {
             hpcolor = Color.RED;
-        } else if (hp > maxhp) {
+        } else if (hp <= maxhp*0.5) {
             hpcolor = Color.YELLOW;
+        } else if (hp > maxhp) {
+            hpcolor = Color.CYAN;
         } else {
             hpcolor = Color.GREEN;
         }
@@ -141,10 +151,11 @@ abstract class PongObject {
             return;
         }
 
-        window.setColor(hpcolor);
-        window.drawRect(xPos-width, yPos-25, maxhp, 10);
-        window.fillRect(xPos-width, yPos-25, hp, 10);
-        window.drawString(Integer.toString(hp), xPos-width+hp-12, yPos-30);
+        //draw HP bars
+        window.setColor(hpcolor); //set color
+        window.drawRect(xPos+width/2-maxhp/2, yPos-25, maxhp, 10); //draw empty bar
+        window.fillRect(xPos+width/2-maxhp/2, yPos-25, hp, 10); //draw full bar
+        window.drawString(Integer.toString(hp), xPos-(maxhp/2)+hp-12+(width/2), yPos-30); //draw number
 
         //this is responsible for the number that appears when hp is changing
         if (hpchange != 0) {
@@ -157,10 +168,10 @@ abstract class PongObject {
         //this is responsible for the warnings/indicators
         if (hp <= maxhp*0.25) {
             window.setColor(Color.RED);
-            window.drawString("!!!", xPos-width+maxhp-10, yPos-30);
+            window.drawString("!!!", xPos+width/2+maxhp/2-12, yPos-30);
         } else if (hp > maxhp) {
             window.setColor(Color.CYAN);
-            window.drawString("+", xPos-width+maxhp-10, yPos-30);
+            window.drawString("+", xPos-width, yPos-30);
         }
     }
 
@@ -171,15 +182,18 @@ abstract class PongObject {
     }
 
     protected void updateHP() {
+        if (invincible) {
+            return;
+        }
         if (hpchange > 0) {
-            if (hpchange > 100) {
+            if (hpchange > 30) { //this is for high speed hp changes, to save time
                 hp += 3;
                 hpchange -=3;
             }
             hp += 1;
             hpchange -= 1;
         } else if (hpchange < 0) {
-            if (hpchange < -45) {
+            if (hpchange < -30) { //this is for high speed hp changes
                 hpchange += 2;
                 hp -=2;
             }
@@ -212,6 +226,12 @@ abstract class PongObject {
         hpchange = -9999;
     }
 
+    protected void fullHeal() {
+        if (hp < maxhp) {
+            hpchange = maxhp-hp;
+        }
+    }
+
     @Override
     public String toString() {
         return String.format("%s: X: %d Y: %d Xb: %d Yb: %d HP: %s HPC: %s aHP: %s", name, xPos, yPos, xPos+width, xPos+height, hp, hpchange, hp+hpchange);
@@ -223,16 +243,18 @@ abstract class PongObject {
 
     protected double calculateBounceAngle(PongObject object) {
         int sizeY = object.getYPos()-object.getHeight();
-        int sizeX = object.getWidth()-object.getXPos(); //currently useless
 
+        int centerP = object.getYPos() + object.getHeight()/2;
         //dist from top
-        int dft = yPos-object.getYPos();
+        int dfc = centerP - object.getYPos();
         //percent from top
-        double pft = (double)dft/sizeY;
+        double pft = (double)dfc/(sizeY/2);
         //get angle of bounce
-        double angle = pft*180;
-        return angle;
-
+        int dir = 1;
+        if (Math.random() < 0.5) {
+            dir = -1;
+        }
+        return pft*50*dir;
     }
 
 

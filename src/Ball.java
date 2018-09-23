@@ -14,8 +14,9 @@ public class Ball extends PongObject {
         height = 25;
         name = "BALL";
         color = Color.RED;
-        maxhp = 999;
-        hp = 999;
+        maxhp = 25;
+        hp = 5;
+        invincible = true;
     }
 
     @Override
@@ -23,6 +24,7 @@ public class Ball extends PongObject {
         if (visible) {
             window.setColor(color);
             window.fillOval(xPos, yPos, 25, 25);
+            drawHP(window);
         }
     }
 
