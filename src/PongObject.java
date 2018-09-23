@@ -8,8 +8,11 @@ abstract class PongObject {
     protected String name = null;
     protected boolean solid = true;
     protected Color color = Color.WHITE;
-
-
+    protected int hp = 100;
+    protected Color hpcolor = Color.GREEN;
+    protected boolean visible = true;
+    protected int hpchange = 0;
+    protected int maxhp = 100;
 
     protected int getXPos() {
         return xPos;
@@ -112,17 +115,106 @@ abstract class PongObject {
     }
 
 
+    protected void damage(int d) {
+        hpchange -= Math.abs(d);
+    }
 
+    protected void heal(int d) {
+        hpchange += Math.abs(d);
+    }
+
+    protected void drawHP(Graphics window) {
+        updateHP();
+        //set bar color
+        if (hp <= maxhp*0.25) {
+            hpcolor = Color.RED;
+        } else if (hp > maxhp) {
+            hpcolor = Color.YELLOW;
+        } else {
+            hpcolor = Color.GREEN;
+        }
+
+        //compact HP to prevent huge bars
+        if (hp > 180) {
+            window.setColor(hpcolor);
+            window.drawString(String.format("HP: %s/%s", hp, maxhp), xPos-width, yPos-30);
+            return;
+        }
+
+        window.setColor(hpcolor);
+        window.drawRect(xPos-width, yPos-25, maxhp, 10);
+        window.fillRect(xPos-width, yPos-25, hp, 10);
+        window.drawString(Integer.toString(hp), xPos-width+hp-12, yPos-30);
+
+        //this is responsible for the number that appears when hp is changing
+        if (hpchange != 0) {
+            if (hpchange > 0) {  window.setColor(Color.CYAN); }
+            else {window.setColor(Color.RED); }
+
+            window.drawString(Integer.toString(hpchange), xPos - width + hp-10, yPos - 42);
+        }
+
+        //this is responsible for the warnings/indicators
+        if (hp <= maxhp*0.25) {
+            window.setColor(Color.RED);
+            window.drawString("!!!", xPos-width+maxhp-10, yPos-30);
+        } else if (hp > maxhp) {
+            window.setColor(Color.CYAN);
+            window.drawString("+", xPos-width+maxhp-10, yPos-30);
+        }
+    }
 
     protected void update() {
     }
 
     protected void update(Graphics window, ArrayList<PongObject> objects) {
-
     }
+
+    protected void updateHP() {
+        if (hpchange > 0) {
+            if (hpchange > 100) {
+                hp += 3;
+                hpchange -=3;
+            }
+            hp += 1;
+            hpchange -= 1;
+        } else if (hpchange < 0) {
+            if (hpchange < -45) {
+                hpchange += 2;
+                hp -=2;
+            }
+            hp -= 1;
+            hpchange += 1;
+        }
+
+        if (hp < 0) {
+            hp = 0;
+            visible = false;
+            solid = false;
+        }
+        if (hp > 0) {
+            visible = true;
+            solid = true;
+        }
+    }
+
+
+    protected void revive() {
+        if (hp == 0 && !solid && !visible) {
+            hp = 1;
+            hpchange = 9;
+            solid = true;
+            visible = true;
+        }
+    }
+
+    protected void kill() {
+        hpchange = -9999;
+    }
+
     @Override
     public String toString() {
-        return String.format("%s: X: %d Y: %d Xb: %d Yb: %d ", name, xPos, yPos, xPos+width, xPos+height);
+        return String.format("%s: X: %d Y: %d Xb: %d Yb: %d HP: %s HPC: %s aHP: %s", name, xPos, yPos, xPos+width, xPos+height, hp, hpchange, hp+hpchange);
     }
 
     protected boolean isSolid() {
@@ -145,8 +237,10 @@ abstract class PongObject {
 
 
     protected void drawHitbox(Graphics window) {
-        window.setColor(color);
-        window.drawRect(xPos, yPos, width, height);
+        if (solid && visible) {
+            window.setColor(color);
+            window.drawRect(xPos, yPos, width, height);
+        }
     }
 }
 

@@ -6,6 +6,7 @@ public class Ball extends PongObject {
     private int direction = -1;
     private double yVel = 0;
 
+
     Ball(int x, int y) {
         xPos = x;
         yPos = y;
@@ -13,12 +14,16 @@ public class Ball extends PongObject {
         height = 25;
         name = "BALL";
         color = Color.RED;
+        maxhp = 999;
+        hp = 999;
     }
 
     @Override
     public void draw(Graphics window) {
-        window.setColor(color);
-        window.fillOval(xPos, yPos, 25, 25);
+        if (visible) {
+            window.setColor(color);
+            window.fillOval(xPos, yPos, 25, 25);
+        }
     }
 
 
@@ -26,7 +31,7 @@ public class Ball extends PongObject {
         if (touching(objects)) {
             direction *= -1; //
         }
-        if (checkOOB(window)) {
+        if (checkOOB(window, objects)) {
             xPos = 1280/2;
         }
         xPos += 8*direction;
@@ -38,6 +43,7 @@ public class Ball extends PongObject {
         for (PongObject object : objects) {
             if (touching(object)) {
                 yVel = calculateBounceAngle(object);
+                object.damage((int)yVel/3);
                 return true;
                 }
             }
@@ -45,18 +51,22 @@ public class Ball extends PongObject {
     }
 
 
-    private boolean checkOOB(Graphics window) {
+    private boolean checkOOB(Graphics window, ArrayList<PongObject> objects) {
         int height = 720;
         int width = 1280;
+        PongObject player1 = objects.get(0);
+        PongObject player2 = objects.get(1);
 
         if ( xPos < 0 ) {
-            System.err.println("right player scored");
+            player1.damage(20);
+            player2.heal(10);
             direction *= -1;
             yVel = 0;
             yPos = height/2;
             return true;
         } else if ( xPos > width ) {
-            System.err.println("left player scored");
+            player2.damage(20);
+            player1.heal(10);
             direction *= -1;
             yVel = 0;
             yPos = height/2;
@@ -80,7 +90,7 @@ public class Ball extends PongObject {
 
     @Override
     public String toString() {
-        return String.format("%s: X: %d Y: %d Xb: %d Yb: %d yVel: %s", name, xPos, yPos, xPos+width, xPos+height, yVel);
+        return String.format("%s: X: %d Y: %d Xb: %d Yb: %d yVel: %s Damage: %s", name, xPos, yPos, xPos+width, xPos+height, yVel, Math.abs(yVel/3));
     }
 
 

@@ -25,8 +25,11 @@ public class Paddle extends PongObject {
 
     @Override
     public void draw(Graphics window) {
-        window.setColor(color);
-        window.fillRoundRect(xPos, yPos, width, height, 20, 50);
+        if (visible) {
+            window.setColor(color);
+            window.fillRoundRect(xPos, yPos, width, height, 20, 50);
+            drawHP(window);
+        }
     }
 
 

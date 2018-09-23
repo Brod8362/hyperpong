@@ -10,11 +10,16 @@ public class Wall extends PongObject {
         color = Color.CYAN;
         name = "WALL";
         solid = true;
+        maxhp = 150;
+        hp = maxhp;
     }
 
     public void draw(Graphics window) {
-        window.setColor(color);
-        window.drawRect(xPos, yPos, width, height);
+        if (visible) {
+            window.setColor(color);
+            window.drawRect(xPos, yPos, width, height);
+            drawHP(window);
+        }
     }
 
 }

@@ -54,6 +54,19 @@ public class Pong extends JFrame implements KeyListener {
             player2.changeYPos(window, -15);
         } else if (key == KeyEvent.VK_K) {
             player2.changeYPos(window, 15);
+        } else if (key == KeyEvent.VK_EQUALS) {
+            player1.heal(5);
+        } else if (key == KeyEvent.VK_MINUS) {
+            player1.damage(5);
+        } else if (key == KeyEvent.VK_0) {
+            player1.heal(999);
+        } else if (key == KeyEvent.VK_9) {
+            player2.revive();
+            player1.revive();
+        } else if (key == KeyEvent.VK_8) {
+            player1.kill();
+            player2.kill();
+            objects.get(3).kill();
         }
     }
 
@@ -70,8 +83,17 @@ public class Pong extends JFrame implements KeyListener {
         frame.setFocusTraversalKeysEnabled(false);
         frame.setVisible(true);
         Graphics window = frame.getGraphics();
+        PongObject player1 = objects.get(0);
+        PongObject player2 = objects.get(1);
 
             while (true) {
+                if (player1.hp < 0 ) {
+                    System.out.println("Player 2 wins!");
+                    System.exit(0);
+                } else if (player2.hp < 0) {
+                    System.out.println("Player 1 wins!");
+                    System.exit(0);
+                }
 
                 try {
                     Thread.sleep(50);  //set to 16 for ~60fps
