@@ -17,15 +17,23 @@ public class Pong extends JFrame implements KeyListener {
 
     Pong() {
         objects.add(new Paddle(50, height/2)); //create left paddle
-        objects.add(new Paddle( width-100, height/2)); //create right paddle
+        objects.add(new AIPaddle( width-100, height/2)); //create right paddle
         objects.add(new Ball(width/2, height/2));
 
-        int randY = ThreadLocalRandom.current().nextInt(100, height-100);
-        int randH = ThreadLocalRandom.current().nextInt(50,  125);
-        int randX = ThreadLocalRandom.current().nextInt(200, width-200);
-        int randmHP = ThreadLocalRandom.current().nextInt(50, 300);
 
-        objects.add(new Wall(randX, randY, 30, randH, randmHP));
+        int wallcount = 9;
+        int i = 0;
+        while ( i < wallcount) {
+            int randY = ThreadLocalRandom.current().nextInt(100, height-100);
+            int randH = ThreadLocalRandom.current().nextInt(50,  125);
+            int randX = ThreadLocalRandom.current().nextInt(200, width-200);
+            int randmHP = ThreadLocalRandom.current().nextInt(5, 80);
+
+            objects.add(new Wall(randX, randY, 30, randH, randmHP));
+            i++;
+        }
+
+
         // create a random wall with a random spawn position and a random height
 
     }
@@ -83,13 +91,41 @@ public class Pong extends JFrame implements KeyListener {
             wall.kill();
         } else if (key == KeyEvent.VK_2) {
             wall.fullHeal();
+        } else if (key == KeyEvent.VK_1) {
+            wall.setInvincible(true);
+        } else if (key == KeyEvent.VK_TAB) {
+            wall.setInvincible(false);
         }
     }
 
 
+    public void randomEvent() {
+        Graphics window = getGraphics();
+        window.setColor(Color.WHITE);
+        PongObject player1 = objects.get(0);
+        PongObject player2 = objects.get(1);
+        window.drawString("RANDOM EVENT!", width / 2, height / 2);
+        try {
+            Thread.sleep(750);
+            if (Math.random() < 0.5) {
+                player1.heal(25);
+                player2.damage(25);
+                window.drawString("P1 Gets Heal! P2 Gets Hurt!", width / 2, (height / 2)+50);
+                Thread.sleep(1000);
+            } else {
+                player2.heal(25);
+                player1.damage(25);
+                window.drawString("P2 Gets Heal! P1 Gets Hurt!", width / 2, (height / 2)+50);
+                Thread.sleep(1000);
+            }
 
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void main() {
+        int tick = 0;
         JFrame frame = this;
         globalFrame = this;
         frame.setSize(width, height); //set dimensions
@@ -112,7 +148,7 @@ public class Pong extends JFrame implements KeyListener {
                 }
 
                 try {
-                    Thread.sleep(50);  //set to 16 for ~60fps
+                    Thread.sleep(35);  //set to 16 for ~60fps
                 } catch (InterruptedException ignored) { }
 
                 window.setColor(Color.BLACK);
@@ -122,16 +158,29 @@ public class Pong extends JFrame implements KeyListener {
 
                 for (PongObject object : objects) { //iterate over and draw objects
                     i ++;
+                    if (tick % 250 == 0) {
+                        if (object.getClass().getName().equals("Paddle") || object.getClass().getName().equals("AIPaddle")) {
+                            object.heal((int)(object.getMaxHP()*0.05));
+                        }
+                    }
+                    if (tick % 10 == 0) {
+                        object.makeVulnerable();
+                    }
                     object.update(window, objects);
                     // update object
                     object.draw(window);
                     // draw object
                     //object.drawHitbox(window);
                     // draw hitbox
-                    window.drawString(object.toString(), 25, i*30);
+                    //window.drawString(object.toString(), 25, i*30);
                     // draw diagnostic info
-                    window.drawString("(= HEAL) (- DAMAGE) (0 +999) (9 REVIVE) (8 KILL) (7 MAXHP) (6 WALL UP) (5 WALL DOWN) (4 WALL REVIVE) (3 WALL KILL) (2 WALL MAX)", 25, height-30);
+                    window.drawString("TICK: "+tick+" (= HEAL) (- DAMAGE) (0 +999) (9 REVIVE) (8 KILL) (7 MAXHP) (6 WALL UP) (5 WALL DOWN) (4 WALL REVIVE) (3 WALL KILL) (2 WALL MAX) (1 WALL INV ON) (TAB WALL INV OFF)", 25, height-30);
                 }
+                if (Math.random() < 0.001) {
+                    randomEvent();
+
+                }
+                tick++;
             }
         }
     }

@@ -3,7 +3,7 @@ import java.awt.*;
 
 public class Paddle extends PongObject {
 
-
+    public Paddle() {}
 
     public Paddle(int _xPos, int _yPos, boolean _xLock) {
         xLock = _xLock;
