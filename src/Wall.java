@@ -1,7 +1,6 @@
 import java.awt.*;
 
 public class Wall extends PongObject {
-
     public Wall(int x, int y, int wid, int hi, int maxhp) {
         xPos = x;
         yPos = y;
@@ -13,7 +12,6 @@ public class Wall extends PongObject {
         this.maxhp = maxhp;
         this.hp = maxhp;
     }
-
     public void draw(Graphics window) {
         if (visible) {
             window.setColor(color);

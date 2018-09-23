@@ -24,7 +24,6 @@ public class Ball extends PongObject {
         if (visible) {
             window.setColor(color);
             window.fillOval(xPos, yPos, 25, 25);
-            //drawHP(window);
         }
     }
 

@@ -1,8 +1,9 @@
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 
 public class Paddle extends PongObject {
-
+    private int velocity;
     public Paddle() {}
 
     public Paddle(int _xPos, int _yPos, boolean _xLock) {
@@ -21,6 +22,7 @@ public class Paddle extends PongObject {
         width = 25;
         height = 85;
         name = "PADDLE";
+        maxhp = 50;
     }
 
     @Override
@@ -32,6 +34,18 @@ public class Paddle extends PongObject {
         }
     }
 
+
+    public int getVelocity() {
+        return velocity;
+    }
+
+    public void setVelocity(int velocity) {
+        this.velocity = velocity;
+    }
+
+    protected void update(Graphics window, ArrayList<PongObject> objects) {
+        changeYPos(window, velocity);
+    }
 
 
 

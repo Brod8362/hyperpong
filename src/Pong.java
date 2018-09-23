@@ -21,21 +21,12 @@ public class Pong extends JFrame implements KeyListener {
         objects.add(new Ball(width/2, height/2));
 
 
-        int wallcount = 9;
+        int wallcount = 3;
         int i = 0;
         while ( i < wallcount) {
-            int randY = ThreadLocalRandom.current().nextInt(100, height-100);
-            int randH = ThreadLocalRandom.current().nextInt(50,  125);
-            int randX = ThreadLocalRandom.current().nextInt(200, width-200);
-            int randmHP = ThreadLocalRandom.current().nextInt(5, 80);
-
-            objects.add(new Wall(randX, randY, 30, randH, randmHP));
+            spawnWall();
             i++;
         }
-
-
-        // create a random wall with a random spawn position and a random height
-
     }
 
 
@@ -45,20 +36,27 @@ public class Pong extends JFrame implements KeyListener {
     }
     @Override
     public void keyReleased(KeyEvent e) {
-        //dont care
+        Paddle player1 = (Paddle) objects.get(0);
+        Paddle player2 = (Paddle) objects.get(1);
+        int key = e.getKeyCode();
+        if (key == KeyEvent.VK_S) {
+            player1.setVelocity(0);
+        } else if (key == KeyEvent.VK_W) {
+            player1.setVelocity(0);
+        }
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
-        PongObject player1 = objects.get(0);
-        PongObject player2 = objects.get(1);
+        Paddle player1 = (Paddle) objects.get(0);
+        Paddle player2 = (Paddle) objects.get(1);
         PongObject wall = objects.get(3);
         Graphics window = globalFrame.getGraphics();
         int key = e.getKeyCode();
         if (key == KeyEvent.VK_S) {
-            player1.changeYPos(window,15);
+            player1.setVelocity(12);
         } else if (key == KeyEvent.VK_W) {
-            player1.changeYPos(window, -15);
+            player1.setVelocity(-12);
         } else if (key == KeyEvent.VK_Q) {
             System.exit(6);
         } else if (key == KeyEvent.VK_I) {
@@ -66,9 +64,11 @@ public class Pong extends JFrame implements KeyListener {
         } else if (key == KeyEvent.VK_K) {
             player2.changeYPos(window, 15);
         } else if (key == KeyEvent.VK_EQUALS) {
-            player1.heal(5);
+            player1.heal(25);
+            player2.heal(25);
         } else if (key == KeyEvent.VK_MINUS) {
-            player1.damage(5);
+            player1.damage(25);
+            player2.damage(25);
         } else if (key == KeyEvent.VK_0) {
             player1.heal(999);
         } else if (key == KeyEvent.VK_9) {
@@ -95,6 +95,16 @@ public class Pong extends JFrame implements KeyListener {
             wall.setInvincible(true);
         } else if (key == KeyEvent.VK_TAB) {
             wall.setInvincible(false);
+        } else if (key == KeyEvent.VK_R) {
+            spawnWall();
+        } else if (key == KeyEvent.VK_E) {
+            for (PongObject object: objects) {
+                object.kill();
+            }
+        } else if (key == KeyEvent.VK_D) {
+            for (PongObject object: objects) {
+                object.revive();
+            }
         }
     }
 
@@ -107,21 +117,38 @@ public class Pong extends JFrame implements KeyListener {
         window.drawString("RANDOM EVENT!", width / 2, height / 2);
         try {
             Thread.sleep(750);
-            if (Math.random() < 0.5) {
+            int choice = ThreadLocalRandom.current().nextInt(1, 4);
+            if (choice == 1) {
                 player1.heal(25);
                 player2.damage(25);
                 window.drawString("P1 Gets Heal! P2 Gets Hurt!", width / 2, (height / 2)+50);
                 Thread.sleep(1000);
-            } else {
+            } else if (choice == 2) {
                 player2.heal(25);
                 player1.damage(25);
                 window.drawString("P2 Gets Heal! P1 Gets Hurt!", width / 2, (height / 2)+50);
+                Thread.sleep(1000);
+            } else if (choice == 3) {
+                for (PongObject object : objects) {
+                    object.revive();
+                    object.heal(object.getMaxHP()/7);
+                }
+                window.drawString("All walls revived!", width / 2, (height / 2)+50);
                 Thread.sleep(1000);
             }
 
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    public void spawnWall() {
+        int randY = ThreadLocalRandom.current().nextInt(100, height-100);
+        int randH = ThreadLocalRandom.current().nextInt(50,  125);
+        int randX = ThreadLocalRandom.current().nextInt(200, width-200);
+        int randmHP = ThreadLocalRandom.current().nextInt(20, 80);
+
+        objects.add(new Wall(randX, randY, 30, randH, randmHP));
     }
 
     public void main() {
@@ -148,7 +175,7 @@ public class Pong extends JFrame implements KeyListener {
                 }
 
                 try {
-                    Thread.sleep(35);  //set to 16 for ~60fps
+                    Thread.sleep(50);  //set to 16 for ~60fps
                 } catch (InterruptedException ignored) { }
 
                 window.setColor(Color.BLACK);
@@ -174,11 +201,10 @@ public class Pong extends JFrame implements KeyListener {
                     // draw hitbox
                     //window.drawString(object.toString(), 25, i*30);
                     // draw diagnostic info
-                    window.drawString("TICK: "+tick+" (= HEAL) (- DAMAGE) (0 +999) (9 REVIVE) (8 KILL) (7 MAXHP) (6 WALL UP) (5 WALL DOWN) (4 WALL REVIVE) (3 WALL KILL) (2 WALL MAX) (1 WALL INV ON) (TAB WALL INV OFF)", 25, height-30);
+                    window.drawString("TICK: "+tick+" (= HEAL)(- DAMAGE)(0 +999)(9 REVIVE)(8 KILL)(7 MAXHP)(6 WALL +)(5 WALL -)(4 WALL REVIVE)(3 WALL KILL)(2 WALL MAX)(1 WALL INV ON)(TAB WALL INV OFF)(R +WALL)(E KILL ALL)(D REV ALL)", 25, height-30);
                 }
                 if (Math.random() < 0.001) {
                     randomEvent();
-
                 }
                 tick++;
             }
