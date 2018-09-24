@@ -16,7 +16,7 @@ public class Pong extends JFrame implements KeyListener {
 
 
     Pong() {
-        objects.add(new Paddle(50, height/2)); //create left paddle
+        objects.add(new TimePaddle(50, height/2)); //create left paddle
         objects.add(new AIPaddle( width-100, height/2)); //create right paddle
         objects.add(new Ball(width/2, height/2));
 
@@ -146,7 +146,7 @@ public class Pong extends JFrame implements KeyListener {
         int randY = ThreadLocalRandom.current().nextInt(100, height-100);
         int randH = ThreadLocalRandom.current().nextInt(50,  125);
         int randX = ThreadLocalRandom.current().nextInt(200, width-200);
-        int randmHP = ThreadLocalRandom.current().nextInt(20, 80);
+        int randmHP = ThreadLocalRandom.current().nextInt(35, 100);
 
         objects.add(new Wall(randX, randY, 30, randH, randmHP));
     }
@@ -185,13 +185,19 @@ public class Pong extends JFrame implements KeyListener {
 
                 for (PongObject object : objects) { //iterate over and draw objects
                     i ++;
-                    if (tick % 250 == 0) {
+                    if (tick % 250 == 0 && tick != 0) {
                         if (object.getClass().getName().equals("Paddle") || object.getClass().getName().equals("AIPaddle")) {
                             object.heal((int)(object.getMaxHP()*0.05));
                         }
                     }
                     if (tick % 10 == 0) {
                         object.makeVulnerable();
+
+                    }
+                    if (tick % 50 == 0 ){
+                        if (object.getClass().getName().equals("Wall")) {
+                            object.damage(1);
+                        }
                     }
                     object.update(window, objects);
                     // update object

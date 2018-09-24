@@ -22,7 +22,8 @@ public class Paddle extends PongObject {
         width = 25;
         height = 85;
         name = "PADDLE";
-        maxhp = 50;
+        maxhp = 100;
+        hp = 100;
     }
 
     @Override

@@ -9,7 +9,7 @@ public class AIPaddle extends Paddle {
         yPos = _yPos;
         width = 25;
         height = 85;
-        name = "PADDLE";
+        name = "AIPADDLE";
     }
 
     public void update(Graphics window, ArrayList<PongObject> objects) {

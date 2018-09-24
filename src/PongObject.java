@@ -149,7 +149,7 @@ abstract class PongObject {
 
     protected void drawHP(Graphics window) {
         updateHP();
-        boolean hpAsPercent = true;
+        int percent = (int)(((double)hp/maxhp)*100);
         int drawY = yPos-25;
         if (drawY < 10 ) {
             drawY = yPos+height+30 ;
@@ -165,69 +165,52 @@ abstract class PongObject {
             hpcolor = Color.GREEN;
         }
 
-        //compact HP to prevent huge bars
-        if (hp > 150 || maxhp > 150) {
-            int percent = (int) (((double)hp/maxhp)*100);
-            window.setColor(hpcolor);
-            if (hp >= (int) (maxhp * 1.5)) {
-                window.drawString(String.format("MAX: %s/%s %s%s", hp, maxhp, percent, "%"), xPos - width, yPos - 30);
-                return;
-            } else if (invincible) {
-                window.drawString(String.format("INV: %s/%s %s%s", hp, maxhp, percent, "%"), xPos - width, yPos - 30);
-                return;
-            }
-            window.drawString(String.format("HP: %s/%s %s%s", hp, maxhp, percent, "%"), xPos - width, yPos - 30);
-            return;
-        }
-
         //draw HP bars
         int hpd = hp % maxhp;
         if (hpd == 0) {
             hpd = maxhp;
         }
-        int tpd = hp;
-        if (tpd > maxhp) {
-            tpd = maxhp;
+        int tpd = percent;
+        if (tpd > 100) {
+            tpd = 100;
         }
+
         window.setColor(hpcolor); //set color
-        window.drawRect(xPos + width / 2 - maxhp / 2, drawY, maxhp, 10); //draw empty bar
-        window.fillRect(xPos + width / 2 - maxhp / 2, drawY, tpd, 10); //draw full bar
+        window.drawRect(xPos + width / 2 - 50, drawY, 100, 10); //draw empty bar
+        window.fillRect(xPos + width / 2 - 50, drawY, tpd, 10); //draw full bar
+
 
         if (hp >= (int)(maxhp*1.5)) {
-            window.drawString("MAX", xPos - (maxhp / 2) + hpd - 12 + (width / 2), drawY-5); //draw max
+            window.drawString("MAX", xPos - (50) + hpd - 12 + (width / 2), drawY-5); //draw max
         } else {
-            if (!hpAsPercent) {
-                window.drawString(Integer.toString(hp), xPos - (maxhp / 2) + hpd - 12 + (width / 2), drawY - 5); //draw number
-            } else {
-                window.drawString(Integer.toString((int)(((double)hp/maxhp)*100))+"%", xPos - (maxhp / 2) + hpd - 12 + (width / 2), drawY - 5); //draw number
-            }
+            window.drawString(percent+"%", xPos+(width/2)-(50)+tpd-2, drawY - 5); //draw number
         }
+
+        Color ofcolor;
+        if ( hpchange < 0) {
+            ofcolor = Color.RED;
+        } else if ( hpchange > 0 ) {
+            ofcolor = Color.CYAN;
+        } else {
+            ofcolor = Color.WHITE;
+        }
+
 
         if (hp > maxhp) {
             window.setColor(Color.CYAN);
-            window.fillRect(xPos+width/2-maxhp/2, drawY, hp-maxhp, 10); //draw full bar
-            window.setColor(Color.WHITE);
-            window.fillRect(xPos+(width/2)-(maxhp/2)+(hp-maxhp), drawY-2, 4, 14); //draw bar thing
+            window.fillRect(xPos + (width / 2)-50, drawY, percent%100, 10); //draw overflow bar
+            window.setColor(ofcolor);
+            window.fillRect(xPos+(width/2)-50+(percent%100), drawY-2, 4, 14); //draw bar thing
         } else {
-            window.setColor(Color.WHITE);
-            window.fillRect(xPos+(width/2)-(maxhp/2)+tpd-2, drawY-2, 4, 14); //draw bar thing
+            window.setColor(ofcolor);
+            window.fillRect(xPos+(width/2)-(50)+tpd-2, drawY-2, 4, 14); //draw bar thing
         }
-
         if (hp >= (int)(maxhp*1.5)) {
             return;
         }
 
-
-        //this is responsible for the number that appears when hp is changing
-        if (hpchange != 0) {
-            if (hpchange > 0) {  window.setColor(Color.CYAN); }
-            else {window.setColor(Color.RED); }
-            window.drawString(Integer.toString(hpchange), xPos-(maxhp/2)+(hp % maxhp)-12+(width/2), drawY-17);
-        }
-
-
         //this is responsible for the warnings/indicators
-        int statusX = xPos+width/2+maxhp/2-12;
+        int statusX = xPos+width/2+50-12;
         int statusY = drawY-5;
 
         if (invincible) {
@@ -240,7 +223,7 @@ abstract class PongObject {
             window.drawString("!!!", statusX, statusY);
         } else if (hp > maxhp) {
             window.setColor(Color.CYAN);
-            window.drawString("+", xPos-(maxhp/2), drawY+7);
+            window.drawString("+", xPos-(50), drawY+7);
         }
     }
 
